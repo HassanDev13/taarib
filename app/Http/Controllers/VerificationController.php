@@ -8,6 +8,7 @@ use App\Models\Term;
 use App\Models\TermEdit;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Storage;
 
 class VerificationController extends Controller
@@ -98,44 +99,111 @@ class VerificationController extends Controller
 
     public function serveImage(ResourcePage $page)
     {
-        if (!$page->image_path) {
+        // 1) If OCR image already exists, serve it directly (fast path)
+        $ocrPath = $page->image_path
+            ? storage_path("app/" . $page->image_path)
+            : null;
+
+        if ($ocrPath && file_exists($ocrPath)) {
+            return $this->serveImageFile($ocrPath);
+        }
+
+        // 2) Check on-demand cache (generated at request time)
+        $resource = $page->resource;
+        if (!$resource || !$resource->path) {
             abort(404);
         }
 
-        $path = storage_path("app/" . $page->image_path);
+        $pdfPath = storage_path("app/private/" . $resource->path);
+        if (!file_exists($pdfPath)) {
+            abort(404);
+        }
 
+        $relativePath = "resource_pages/" . $resource->id . "/page-{$page->page_number}.jpg";
+        $cacheFile = storage_path("app/" . $relativePath);
+
+        // 3) Return cached image if already stored (either OCR or previously generated)
+        if (file_exists($cacheFile)) {
+            // Update image_path in DB if not set (e.g. old OCR pages already have it)
+            if (!$page->image_path) {
+                $page->update(['image_path' => $relativePath]);
+            }
+            return $this->serveImageFile($cacheFile);
+        }
+
+        if (!is_dir(dirname($cacheFile))) {
+            mkdir(dirname($cacheFile), 0755, true);
+        }
+
+        // pdftoppm adds "-{page}.jpg" to output prefix, so we use a temp prefix
+        $tmpPrefix = dirname($cacheFile) . "/_gen_{$page->page_number}";
+
+        $cmd = [
+            "/usr/bin/pdftoppm",
+            "-f", (string) $page->page_number,
+            "-l", (string) $page->page_number,
+            "-jpeg",
+            "-r", "120",
+            $pdfPath,
+            $tmpPrefix,
+        ];
+
+        $process = new \Symfony\Component\Process\Process($cmd);
+        $process->setTimeout(30);
+        $process->run();
+
+        // pdftoppm outputs zero-padded: {prefix}-001.jpg, {prefix}-066.jpg, {prefix}-119.jpg
+        $generatedFile = $tmpPrefix . "-" . str_pad($page->page_number, 3, "0", STR_PAD_LEFT) . ".jpg";
+
+        if (!$process->isSuccessful() || !file_exists($generatedFile)) {
+            // Try glob fallback in case padding is different
+            $glob = glob($tmpPrefix . "-*.jpg");
+            $generatedFile = $glob[0] ?? null;
+            if (!$generatedFile || !file_exists($generatedFile)) {
+                abort(404);
+            }
+        }
+
+        // Rename to final cache path
+        rename($generatedFile, $cacheFile);
+
+        // Save image_path to database so next request goes directly to cache
+        $page->update(['image_path' => $relativePath]);
+
+        return $this->serveImageFile($cacheFile);
+    }
+
+    private function serveImageFile(string $path)
+    {
         if (!file_exists($path)) {
             abort(404);
         }
 
-        // Add caching headers for better performance
         $lastModified = filemtime($path);
         $etag = md5($path . $lastModified);
 
-        // Check if client has cached version
         $ifNoneMatch = request()->header("If-None-Match");
         $ifModifiedSince = request()->header("If-Modified-Since");
 
         if ($ifNoneMatch && $ifNoneMatch === $etag) {
-            return response()->make("", 304); // Not Modified
+            return response()->make("", 304);
         }
 
-        if ($ifModifiedSince && strtotime($ifModifiedSince) >= $lastModified) {
-            return response()->make("", 304); // Not Modified
+        if (
+            $ifModifiedSince &&
+            strtotime($ifModifiedSince) >= $lastModified
+        ) {
+            return response()->make("", 304);
         }
+
+        // Determine MIME from extension
+        $mime = str_ends_with($path, ".png") ? "image/png" : "image/jpeg";
 
         return response()
-            ->file($path)
-            ->header("Cache-Control", "public, max-age=31536000") // 1 year
-            ->header(
-                "Expires",
-                gmdate("D, d M Y H:i:s", time() + 31536000) . " GMT",
-            )
-            ->header("ETag", $etag)
-            ->header(
-                "Last-Modified",
-                gmdate("D, d M Y H:i:s", $lastModified) . " GMT",
-            );
+            ->file($path, [
+                "Content-Type" => $mime,
+                "Cache-Control" => "public, max-age=31536000",
+            ]);
     }
 
     public function updateTerm(Request $request, Term $term)

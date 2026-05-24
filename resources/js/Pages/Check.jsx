@@ -75,11 +75,14 @@ export default function CheckPage({
             };
             img.src = route("pages.image", page.id);
         } else {
+            // No image_path at all — skip image load, go straight to PDF
+            setImageError(true);
             setShowPdfDirectly(true);
+            setShowPdf(true);
         }
 
         // Preload next image if available
-        if (nextTermId) {
+        if (nextTermId && page?.image_path) {
             const preloadImage = new Image();
             preloadImage.src = route("pages.image", nextTermId);
         }
@@ -297,15 +300,16 @@ export default function CheckPage({
                                     1. User toggled to PDF view, OR
                                     2. No image available, OR  
                                     3. Image failed to load */}
-                                {(showPdf || showPdfDirectly || !page?.image_path || imageError) &&
+                                {(showPdf || showPdfDirectly || imageError) &&
                                 resource &&
+                                resource.path &&
                                 page?.page_number ? (
                                     <iframe
-                                        src={`${route("resources.pdf", resource.id)}#page=${page.page_number}`}
+                                        src={route("resources.pdf", { resource: resource.id }) + "#page=" + page.page_number}
                                         className="w-full h-full border-0"
                                         title="PDF Viewer"
                                     />
-                                ) : page?.image_path ? (
+                                ) : page?.image_path || (resource && page?.page_number) ? (
                                     <>
                                         {!imageLoaded && !imageError && (
                                             <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
