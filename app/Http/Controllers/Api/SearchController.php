@@ -30,7 +30,7 @@ class SearchController extends Controller
             ]);
         }
 
-        $result = $this->searchService->searchTerms($search);
+        $result = $this->searchService->searchTerms($search, false, true);
 
         return response()->json([
             'data' => $result,
