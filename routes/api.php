@@ -9,8 +9,10 @@ Route::post('/clean_text/{resource:id}', [ExtractController::class, 'cleanText']
 
 use App\Http\Controllers\Api\SearchController;
 
-Route::get('/search', [SearchController::class, 'search']);
-Route::get('/resources', [SearchController::class, 'resources']);
+Route::prefix('v1')->group(function () {
+    Route::get('/search', [SearchController::class, 'search'])->middleware('throttle:search_api');
+    Route::get('/resources', [SearchController::class, 'resources'])->middleware('throttle:search_api');
+});
 
 use App\Http\Controllers\Api\ChatController;
 Route::post('/chat', [ChatController::class, 'chat']);

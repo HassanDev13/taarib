@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Head, router } from "@inertiajs/react";
+import { Head, router, Link, usePage } from "@inertiajs/react";
 import { Input } from "@/Components/ui/input";
 import {
     Card,
@@ -18,6 +18,12 @@ import {
     Upload,
     Eye,
     Layers,
+    User,
+    Settings,
+    LogOut,
+    ArrowLeft,
+    Database,
+    Sparkles,
 } from "lucide-react";
 import { useLanguage } from "@/Contexts/LanguageContext";
 import TermStatsModal from "@/Components/TermStatsModal";
@@ -27,12 +33,13 @@ export default function Index({ groupedTerms = [], filters }) {
     const [search, setSearch] = useState(filters.search || "");
     const [selectedTerm, setSelectedTerm] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { auth } = usePage().props;
 
-    // Debounced search
+    // Debounced search live update
     useEffect(() => {
         const timer = setTimeout(() => {
             router.get(
-                "/",
+                "/classic",
                 { search },
                 {
                     preserveState: true,
@@ -52,236 +59,189 @@ export default function Index({ groupedTerms = [], filters }) {
 
     return (
         <>
-            <Head title={t("search.title")} />
+            <Head title="البحث التقليدي | تعريب" />
 
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-                    {/* Header */}
-                    <div className="mb-6 sm:mb-8">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                            <div className="flex-1">
-                                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                                    {t("search.title")}
-                                </h1>
-                                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                                    {t("search.subtitle")}
-                                </p>
-                            </div>
-                            <div className="flex items-center justify-between sm:justify-end gap-3">
-                                <a
-                                    href="/check"
-                                    className="flex items-center gap-1 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors shadow-md hover:shadow-lg text-sm sm:text-base"
-                                >
-                                    <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
-                                    <span className="hidden sm:inline">
-                                        Check Terms
-                                    </span>
-                                    <span className="sm:hidden">Check</span>
-                                </a>
-                                <a
-                                    href="/leaderboard"
-                                    className="flex items-center gap-1 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-colors shadow-md hover:shadow-lg text-sm sm:text-base"
-                                >
-                                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
-                                    <span className="hidden sm:inline">
-                                        {t("leaderboard.title")}
-                                    </span>
-                                    <span className="sm:hidden">
-                                        {t("leaderboard.short")}
-                                    </span>
-                                </a>
-                                <a
-                                    href="/upload"
-                                    className="flex items-center gap-1 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors shadow-md hover:shadow-lg text-sm sm:text-base"
-                                >
-                                    <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
-                                    <span className="hidden sm:inline">
-                                        Upload
-                                    </span>
-                                    <span className="sm:hidden">Upload</span>
-                                </a>
-                            </div>
+            <div className="min-h-screen bg-slate-50 text-slate-900 font-arabic selection:bg-blue-100 selection:text-blue-900 pb-20 overflow-x-hidden" dir="rtl">
+                
+                {/* Fixed Header / Navbar */}
+                <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/80 shadow-sm">
+                    <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+                        
+                        {/* Logo and Back Link */}
+                        <div className="flex items-center gap-3 shrink-0">
+                            <Link href="/" className="p-2 -mr-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all" title="العودة للرئيسية">
+                                <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+                            </Link>
+                            <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+                                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-1.5 rounded-xl shadow-sm">
+                                    <img src="/images/logo.png" alt="Logo" className="h-5 w-5 object-contain brightness-0 invert" />
+                                </div>
+                                <span className="text-sm font-black text-slate-800 tracking-tight">تعريب</span>
+                            </Link>
+                            <span className="hidden sm:inline bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-full font-bold border border-slate-200">
+                                البحث التقليدي
+                            </span>
+                        </div>
+
+                        {/* Middle: Stats / Navigation Links */}
+                        <div className="hidden md:flex items-center gap-3">
+                            <Link href="/leaderboard" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                                <Trophy className="h-3.5 w-3.5" />
+                                <span>لوحة المساهمين</span>
+                            </Link>
+                            <Link href="/check" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                                <Eye className="h-3.5 w-3.5" />
+                                <span>تدقيق المصطلحات</span>
+                            </Link>
+                            <Link href="/upload" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                                <Upload className="h-3.5 w-3.5" />
+                                <span>رفع المستندات</span>
+                            </Link>
+                        </div>
+
+                        {/* Left: User Profile & Settings */}
+                        <div className="flex items-center gap-2.5">
+                            {auth.user ? (
+                                <>
+                                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
+                                        <div className="bg-blue-600 text-white rounded-lg p-0.5">
+                                            <User className="h-3 w-3" />
+                                        </div>
+                                        <span className="text-blue-700 text-xs font-bold">{auth.user.name}</span>
+                                    </div>
+                                    <Link href={route('settings.edit')} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors" title="الإعدادات">
+                                        <Settings className="h-4 w-4" />
+                                    </Link>
+                                    <Link href={route('logout')} method="post" as="button" className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors" title="تسجيل الخروج">
+                                        <LogOut className="h-4 w-4" />
+                                    </Link>
+                                </>
+                            ) : (
+                                <Link href="/" className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-slate-200">
+                                    <Sparkles className="h-3.5 w-3.5 text-blue-500 animate-pulse" />
+                                    <span>جرب البحث بالذكاء</span>
+                                </Link>
+                            )}
                         </div>
                     </div>
+                </nav>
 
-                    {/* Search Bar */}
-                    <div className="mb-6 sm:mb-8">
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    {/* Header Details */}
+                    <div className="mb-8 text-right">
+                        <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">
+                            البحث المعجمي التقليدي
+                        </h1>
+                        <p className="text-slate-500 text-sm md:text-base font-medium">
+                            ابحث مباشرة في قاعدة بيانات المعاجم والكتب المعتمدة دون تدخل الذكاء الاصطناعي.
+                        </p>
+                    </div>
+
+                    {/* Search Input Card */}
+                    <div className="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xl shadow-slate-900/5 mb-8">
                         <div className="relative max-w-2xl">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 sm:h-5 sm:w-5" />
-                            <Input
+                            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-350 h-5 w-5 pointer-events-none" />
+                            <input
                                 type="text"
-                                placeholder={t("search.placeholder")}
+                                placeholder="ابحث عن مصطلح بالإنجليزية أو العربية (مثلاً: compiler, array)..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="pl-8 sm:pl-10 h-10 sm:h-12 text-base sm:text-lg dark:text-white"
+                                className="w-full h-12 pr-12 pl-4 bg-slate-50 border border-slate-200 rounded-2xl text-[16px] font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                dir="rtl"
                             />
                         </div>
                         {search && (
-                            <p className="mt-2 text-xs sm:text-sm text-gray-500">
-                                Found {groupedTerms.length} unique term
-                                {groupedTerms.length !== 1 ? "s" : ""}
+                            <p className="mt-3 text-xs font-bold text-slate-400">
+                                تم العثور على {groupedTerms.length} مصطلح فريد مطابق
                             </p>
                         )}
                     </div>
 
-                    {/* Results */}
-                    <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                        {!search ? (
-                            <div className="col-span-full text-center py-8 sm:py-12">
-                                <Search className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mb-3 sm:mb-4" />
-                                <p className="text-gray-500 text-base sm:text-lg">
-                                    Enter a search term to get started
-                                </p>
-                                <p className="text-gray-400 text-xs sm:text-sm mt-2">
-                                    Search is case-insensitive and will group
-                                    similar terms
-                                </p>
-                            </div>
-                        ) : groupedTerms.length === 0 ? (
-                            <div className="col-span-full text-center py-8 sm:py-12">
-                                <FileText className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mb-3 sm:mb-4" />
-                                <p className="text-gray-500 text-base sm:text-lg">
-                                    {t("search.no_results")}
-                                </p>
-                                <p className="text-gray-400 text-xs sm:text-sm mt-2">
-                                    {t("search.try_adjusting")}
-                                </p>
-                            </div>
-                        ) : (
-                            groupedTerms.map((termGroup, idx) => {
-                                return (
-                                    <Card
-                                        key={idx}
-                                        className="hover:shadow-lg transition-shadow cursor-pointer"
-                                        onClick={() =>
-                                            handleTermClick(termGroup)
-                                        }
-                                    >
-                                        <CardHeader className="p-3 sm:p-6">
-                                            <div className="flex items-start justify-between gap-2 mb-2">
-                                                <CardTitle className="text-base sm:text-lg line-clamp-2 flex-1">
-                                                    {termGroup.display_term_en ||
-                                                        "N/A"}
-                                                </CardTitle>
+                    {/* Results Section */}
+                    {!search ? (
+                        <div className="text-center py-20 bg-white rounded-3xl border border-slate-200/60 shadow-sm">
+                            <Database className="mx-auto h-16 w-16 text-blue-100 mb-4 stroke-[1.5]" />
+                            <h3 className="text-lg font-bold text-slate-700 mb-1">ابدأ البحث الآن</h3>
+                            <p className="text-slate-400 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
+                                اكتب المصطلح الذي تبحث عنه في المربع أعلاه لعرض الترجمات والكتب التي ورد فيها.
+                            </p>
+                        </div>
+                    ) : groupedTerms.length === 0 ? (
+                        <div className="text-center py-20 bg-white rounded-3xl border border-slate-200/60 shadow-sm">
+                            <FileText className="mx-auto h-16 w-16 text-slate-200 mb-4 stroke-[1.5]" />
+                            <h3 className="text-lg font-bold text-slate-700 mb-1">لم نجد نتائج مطابقة</h3>
+                            <p className="text-slate-400 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
+                                تأكد من كتابة المصطلح بشكل صحيح أو جرب البحث عن كلمة أخرى.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {groupedTerms.map((termGroup, idx) => (
+                                <div
+                                    key={idx}
+                                    className="bg-white border border-slate-250/70 hover:border-blue-400 hover:shadow-xl hover:shadow-blue-900/5 rounded-3xl p-5 cursor-pointer transition-all duration-300 flex flex-col justify-between group"
+                                    onClick={() => handleTermClick(termGroup)}
+                                >
+                                    <div>
+                                        {/* Term english name */}
+                                        <div className="flex items-start justify-between gap-2 mb-2.5">
+                                            <span className="font-mono font-bold text-slate-800 text-base group-hover:text-blue-600 transition-colors">
+                                                {termGroup.display_term_en || "N/A"}
+                                            </span>
+                                        </div>
+                                        {/* Arabic translation */}
+                                        <div className="text-xl font-black text-slate-900 font-arabic mb-4 text-right" dir="rtl">
+                                            {termGroup.display_term_ar || "N/A"}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                                        {/* Badges row */}
+                                        <div className="flex flex-wrap gap-1.5">
+                                            <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-none font-bold text-[10px] px-2.5 py-1 rounded-lg">
+                                                <Layers className="h-3 w-3 ml-1 text-blue-500" />
+                                                <span>{termGroup.total_count} تكرار</span>
+                                            </Badge>
+                                            <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 border-none font-bold text-[10px] px-2.5 py-1 rounded-lg">
+                                                <BookOpen className="h-3 w-3 ml-1 text-indigo-500" />
+                                                <span>{termGroup.resource_count} كتب</span>
+                                            </Badge>
+                                            {termGroup.variations.length > 1 && (
+                                                <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-100 border-none font-bold text-[10px] px-2.5 py-1 rounded-lg">
+                                                    <span>{termGroup.variations.length} تنوعات</span>
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        {/* Top Resources Details */}
+                                        <div className="text-xs text-slate-500 space-y-1">
+                                            <div className="font-bold text-slate-400 mb-1 text-[11px] uppercase tracking-wider">
+                                                أهم الكتب والمصادر:
                                             </div>
-                                            <CardDescription
-                                                className="text-lg sm:text-xl font-arabic line-clamp-2"
-                                                dir="rtl"
-                                            >
-                                                {termGroup.display_term_ar ||
-                                                    "N/A"}
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="p-3 sm:p-6 pt-0">
-                                            <div className="space-y-3">
-                                                {/* Statistics Badges */}
-                                                <div className="flex flex-wrap gap-2">
-                                                    <Badge
-                                                        variant="default"
-                                                        className="text-xs bg-blue-500"
-                                                    >
-                                                        <Layers className="h-3 w-3 mr-1" />
-                                                        {termGroup.total_count}{" "}
-                                                        occurrence
-                                                        {termGroup.total_count !==
-                                                        1
-                                                            ? "s"
-                                                            : ""}
-                                                    </Badge>
-
-                                                    <Badge
-                                                        variant="secondary"
-                                                        className="text-xs"
-                                                    >
-                                                        <BookOpen className="h-3 w-3 mr-1" />
-                                                        {
-                                                            termGroup.resource_count
-                                                        }{" "}
-                                                        book
-                                                        {termGroup.resource_count !==
-                                                        1
-                                                            ? "s"
-                                                            : ""}
-                                                    </Badge>
-
-                                                    {termGroup.variations
-                                                        .length > 1 && (
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="text-xs"
-                                                        >
-                                                            {
-                                                                termGroup
-                                                                    .variations
-                                                                    .length
-                                                            }{" "}
-                                                            variation
-                                                            {termGroup
-                                                                .variations
-                                                                .length !== 1
-                                                                ? "s"
-                                                                : ""}
-                                                        </Badge>
-                                                    )}
+                                            {termGroup.resources.slice(0, 2).map((res, ridx) => (
+                                                <div key={ridx} className="flex justify-between items-center text-slate-600 font-medium">
+                                                    <span className="truncate max-w-[180px]">{res.resource_name}</span>
+                                                    <span className="font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded text-[10px]">
+                                                        {res.count}x
+                                                    </span>
                                                 </div>
-
-                                                {/* Top Resources Preview */}
-                                                <div className="text-xs text-gray-600 dark:text-gray-400">
-                                                    <div className="font-medium mb-1">
-                                                        Top Books:
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        {termGroup.resources
-                                                            .slice(0, 2)
-                                                            .map(
-                                                                (
-                                                                    resource,
-                                                                    ridx,
-                                                                ) => (
-                                                                    <div
-                                                                        key={
-                                                                            ridx
-                                                                        }
-                                                                        className="flex items-center justify-between"
-                                                                    >
-                                                                        <span className="truncate flex-1">
-                                                                            {
-                                                                                resource.resource_name
-                                                                            }
-                                                                        </span>
-                                                                        <span className="ml-2 font-semibold text-gray-900 dark:text-white">
-                                                                            {
-                                                                                resource.count
-                                                                            }
-                                                                            x
-                                                                        </span>
-                                                                    </div>
-                                                                ),
-                                                            )}
-                                                        {termGroup.resources
-                                                            .length > 2 && (
-                                                            <div className="text-gray-500 italic">
-                                                                +
-                                                                {termGroup
-                                                                    .resources
-                                                                    .length - 2}{" "}
-                                                                more...
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                            ))}
+                                            {termGroup.resources.length > 2 && (
+                                                <div className="text-slate-400 font-bold text-[10px] italic">
+                                                    + {termGroup.resources.length - 2} مصادر أخرى
                                                 </div>
+                                            )}
+                                        </div>
 
-                                                {/* Click to view more */}
-                                                <div className="text-xs text-blue-600 dark:text-blue-400 font-medium pt-2 border-t border-gray-200 dark:border-gray-700">
-                                                    Click to view details →
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                );
-                            })
-                        )}
-                    </div>
+                                        <div className="flex items-center justify-end text-xs font-bold text-blue-600 pt-2 border-t border-slate-50/50 group-hover:translate-x-[-4px] transition-transform">
+                                            <span>تفاصيل ومواقع الكلمة</span>
+                                            <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 

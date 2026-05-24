@@ -118,16 +118,20 @@ function FAQAccordion() {
             a: "بما أننا في المرحلة الأولى من المشروع، ولضمان أقصى درجات الدقة والموثوقية لقاعدة البيانات، فإننا نعتمد حالياً فقط على المعاجم المعتمدة والصادرة عن مجامع اللغة العربية والجهات الرسمية.\n\nيمكنك الاطلاع على القائمة الكاملة للمراجع المستخدمة وتحميلها عبر مستودعنا المفتوح على منصة جيت هاب من خلال هذا الرابط:\n [مستودع المراجع (HassanDev13/terminology-books)](https://github.com/HassanDev13/terminology-books)."
         },
         {
+            q: "لماذا يقتصر نطاق المشروع حالياً على مجال المعلوماتية والتقنية؟",
+            a: "في هذه المرحلة التأسيسية للمشروع، اخترنا التركيز بشكل كامل على حقل المعلوماتية نظراً للتسارع الهائل في إنتاج التقنية، والحاجة الماسة لتوحيد وضبط المصطلحات البرمجية والتقنية المعاصرة. نحن نعمل على إرساء نموذج صلب وخوارزميات دقيقة في هذا التخصص ليكون نواة أساسية، وبحول الله تعالى سنعمل مستقبلاً على التوسع وضم مجالات وتخصصات علمية وطبية وهندسية أخرى لتكوين مرجعية معجمية عربية شاملة."
+        },
+        {
             q: "كيف يتم تحديد 'المصطلح الأكثر استعمالاً'؟",
-            a: "يقوم نظامنا بإحصاء تكرار كل ترجمة عبر المراجع المعتمدة، ويُرجِّح المصطلح الذي ورد في أكبر عدد من المصادر المستقلة (وليس عدد مرات التكرار الكلي)، مما يعطي مؤشراً حقيقياً حول الإجماع الفعلي على المصطلح بدلاً من تنظير فردي أو مؤسساتي."
+            a: "يقوم نظامنا بإحصاء تكرار كل ترجمة عبر المراجع المعتمدة، ويُرجِّح المصطلح الذي ورد في أكبر عدد من المصادر المستقلة (وليس عدد مرات التكرار الكلي)، مما يعطي مؤشراً حقيقياً حول الإجماع الفعلي على المصطلح بدلاً من تنظير فردي أو مؤسساتي.\n\nتعتمد هذه المنهجية المتقدمة في تحديد المقبولية والاستعمال على نماذج الذكاء الاصطناعي، وهي أدوات متاحة حالياً بشكل حصري لمجامع اللغة العربية والباحثين الأكاديميين."
         },
         {
             q: "هل نتائج البحث دقيقة وموثوقة بنسبة 100%؟",
-            a: "يتم استخراج النتائج آلياً باستخدام تقنيات الذكاء الاصطناعي المتقدمة من مراجع موثوقة. ورغم الدقة العالية التي يوفرها النظام، فإننا ننوه دائماً باحتمالية وجود أخطاء في الاستخراج الآلي أو انحرافات بسبب سياق الكلمة، وندعو لمراجعة الصفحة وتدقيق المصدر الموثق في حال الشك."
+            a: "يتم استخراج النتائج آلياً من المراجع المعتمدة. ورغم الدقة العالية التي يوفرها النظام، فإننا ننوه دائماً باحتمالية وجود أخطاء في الاستخراج الآلي أو انحرافات بسبب سياق الكلمة، وندعو لمراجعة الصفحة وتدقيق المصدر الموثق في حال الشك."
         },
         {
             q: "كيف يمكنني المساهمة في تطوير هذا المشروع؟",
-            a: "نرحب دوماً بمساهمات المجتمع اللغوي والتقني! يمكنك مشاركة اقتراحاتك حول مصطلحات جديدة، أو الإبلاغ عن أخطاء عبر نموذج التواصل أسفله. كما يمكنك زيارة المستودع والمساهمة في إضافة مراجع تقنية معتمدة جديدة ليقوم الذكاء الاصطناعي بضمها لقاعدة البيانات."
+            a: "نرحب دوماً بمساهمات المجتمع اللغوي والتقني! يمكنك مشاركة اقتراحاتك حول مصطلحات جديدة، أو الإبلاغ عن أخطاء عبر نموذج التواصل أسفله. كما يمكنك زيارة المستودع والمساهمة في إضافة مراجع تقنية معتمدة جديدة ليتم ضمها لقاعدة البيانات."
         }
     ];
 
@@ -224,44 +228,18 @@ export default function LandingSearchPage() {
 
                         {/* Desktop links */}
                         <div className="hidden md:flex items-center gap-1">
-                            <a href="#timeline" className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
-                                الرحلة
-                            </a>
                             <a href="#faq" className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
                                 الأسئلة الشائعة
                             </a>
-
+                            <Link href={route('developers')} className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
+                                للمطورين
+                            </Link>
+                            <Link href={route('contact')} className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
+                                للمجامع اللغوية
+                            </Link>
                             <a href="#contact" className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
                                 تواصل معنا
                             </a>
-                            <Link href={route('changelog')} className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
-                                سجل التحديثات
-                            </Link>
-                            {/* <Link href={route('award')} className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-amber-600 transition-colors rounded-xl hover:bg-amber-50">
-                                جائزة يوغرطة
-                            </Link> */}
-
-                            
-                            {auth.user ? (
-                                <>
-                                    <div className="w-px h-5 bg-slate-200 mx-1" />
-                                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
-                                        <div className="bg-blue-600 text-white rounded-lg p-0.5"><User className="h-3 w-3" /></div>
-                                        <span className="text-blue-700 text-xs font-bold">{auth.user.name}</span>
-                                    </div>
-                                    <Link href={route('settings.edit')} className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
-                                        <Settings className="h-3.5 w-3.5" />
-                                    </Link>
-                                    <Link href={route('logout')} method="post" as="button" className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors">
-                                        <LogOut className="h-3.5 w-3.5" />
-                                    </Link>
-                                </>
-                            ) : (
-                                <Link href={route('login')} className="flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
-                                    <User className="h-4 w-4" />
-                                    <span>دخول</span>
-                                </Link>
-                            )}
                         </div>
 
                         {/* Mobile hamburger */}
@@ -281,14 +259,6 @@ export default function LandingSearchPage() {
                         <div className="absolute top-[72px] left-4 right-4 max-w-4xl mx-auto bg-white/95 backdrop-blur-2xl border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-900/10 overflow-hidden">
                             <div className="p-2 space-y-0.5">
                                 <a
-                                    href="#timeline"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 font-bold text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                                >
-                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                                    الرحلة
-                                </a>
-                                <a
                                     href="#faq"
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 font-bold text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
@@ -296,7 +266,22 @@ export default function LandingSearchPage() {
                                     <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                                     الأسئلة الشائعة
                                 </a>
-
+                                <Link
+                                    href={route('developers')}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 font-bold text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                    للمطورين
+                                </Link>
+                                <Link
+                                    href={route('contact')}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 font-bold text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                    للمجامع اللغوية
+                                </Link>
                                 <a
                                     href="#contact"
                                     onClick={() => setMobileMenuOpen(false)}
@@ -305,14 +290,7 @@ export default function LandingSearchPage() {
                                     <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                                     تواصل معنا
                                 </a>
-                                <Link
-                                    href={route('changelog')}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 font-bold text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                                >
-                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                                    سجل التحديثات
-                                </Link>
+
                                 {/* <Link
                                     href={route('award')}
                                     onClick={() => setMobileMenuOpen(false)}
@@ -322,17 +300,6 @@ export default function LandingSearchPage() {
                                     جائزة يوغرطة
                                 </Link> */}
 
-                                {auth.user && (
-                                    <>
-                                        <div className="h-px bg-slate-100 mx-2 my-1" />
-                                        <Link href={route('settings.edit')} className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 font-bold text-sm hover:bg-blue-50 w-full transition-colors">
-                                            <Settings className="h-4 w-4" /><span>الإعدادات</span>
-                                        </Link>
-                                        <Link href={route('logout')} method="post" as="button" className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 font-bold text-sm hover:bg-red-50 w-full transition-colors">
-                                            <LogOut className="h-4 w-4" /><span>خروج</span>
-                                        </Link>
-                                    </>
-                                )}
                             </div>
                         </div>
                     )}
@@ -354,17 +321,6 @@ export default function LandingSearchPage() {
                             <p className="text-slate-500 text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-medium px-2">
                                 معجم عربي ذكي يقوم على قياس المقبولية والاستعمال الواقعي، بدلاً من التوحيد النظري الجامد.
                             </p>
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 px-4">
-                                <a 
-                                    href="https://docs.google.com/document/d/YOUR_GOOGLE_DOC_ID" 
-                                    target="_blank" rel="noopener noreferrer"
-                                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-900 text-white px-6 py-3.5 rounded-full font-bold hover:bg-slate-800 transition-all shadow-lg active:scale-95 text-sm"
-                                >
-                                    <FileText className="h-4 w-4" />
-                                    <span>تصفح الورقة المفاهيمية</span>
-                                    <span className="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded-full font-bold mr-1">قريباً</span>
-                                </a>
-                            </div>
                         </div>
 
                         {/* Search Bar */}
@@ -455,64 +411,10 @@ export default function LandingSearchPage() {
                             </span>
                             <span className="text-sm md:text-base font-extrabold text-slate-500">مصدر مرجعي معتمد</span>
                         </div>
-                        <div className="w-full md:w-px h-px md:h-20 bg-slate-100"></div>
-                        <div className="flex flex-col items-center gap-2.5 text-center group">
-                            <span className="text-4xl md:text-5xl font-black text-violet-600 tracking-tighter transition-transform group-hover:scale-110">
-                                {stats.users_count > 0 ? '+' : ''}{stats.users_count.toLocaleString('en-US')}
-                            </span>
-                            <span className="text-sm md:text-base font-extrabold text-slate-500">باحث ومستخدم مسجل</span>
-                        </div>
                     </section>
                 )}
 
 
-                {/* Timeline Section */}
-                <section id="timeline" className="py-20 px-4 bg-slate-50 border-b border-slate-100">
-                    <div className="container mx-auto max-w-3xl">
-                        <div className="text-center mb-14 space-y-3">
-                            <h3 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
-                                سنة من <span className="text-blue-600">العمل</span>
-                            </h3>
-                            <p className="text-slate-500 text-base md:text-lg max-w-2xl mx-auto font-medium">
-                                هكذا بدأت الرحلة: سؤالٌ صغير، ورؤية تتسع، ومشروع يسعى لأن يعيد للمصطلح العربي مكانته في فضاء العلم والتقنية.
-                            </p>
-                        </div>
-
-                        {/* Timeline — single column, RTL */}
-                        <div className="relative" dir="rtl">
-                            {/* Vertical line on the right */}
-                            <div className="absolute right-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 via-indigo-200 to-slate-100" />
-
-                            <div className="space-y-6">
-                                {[
-                                    { date: "جانفي – مارس 2025", phase: "البداية", dot: "bg-blue-500", badge: "bg-blue-50 text-blue-700 border-blue-100", title: "ولادة الفكرة", desc: "لم تكن البداية مشروعًا بقدر ما كانت سؤالًا مقلقًا يتردد بإلحاح: ما موقع اللغة الأم في صناعة المعرفة؟ وكيف يمكن لأمة أن تنتج علمًا وهي تفكر بمصطلحات مستعارة؟ من هنا تشكّلت النواة الأولى، لا كردّ فعل عاطفي، بل كمحاولة جادة لفهم العلاقة العميقة بين اللغة والإنتاج العلمي، وبين المصطلح والقدرة على الابتكار." },
-                                    { date: "04 أفريل 2025", phase: "إعلان نية", dot: "bg-indigo-500", badge: "bg-indigo-50 text-indigo-700 border-indigo-100", title: "المبادرة الأولى", desc: "وُلدت الورقة المفاهيمية بعنوان «تعريب المصطلحات التقنية»، ليس كنص نظري فقط، بل كإعلان نية. عُرضت على عدد من الدكاترة والمتخصصين، وخضعت للنقاش والمراجعة، لتتحول من فكرة فردية إلى مشروع قابل للنقد والبناء." },
-                                    { date: "أفريل – أوت 2025", phase: "بحث معمق", dot: "bg-violet-500", badge: "bg-violet-50 text-violet-700 border-violet-100", title: "تعميق الرؤية", desc: "بدأت مرحلة الغوص في إشكالية المصطلح: كيف يتشكل؟ كيف يُفرض؟ وكيف يؤثر في بنية التفكير العلمي؟ تمت مراجعة الأدبيات، وتتبع التجارب اللغوية المقارنة، وتحليل أثر الازدواجية اللغوية في البيئة الأكاديمية." },
-                                    { date: "سبتمبر – ديسمبر 2025", phase: "تأسيس", dot: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-100", title: "من الفكرة إلى البناء", desc: "أُعيدت صياغة الورقة المفاهيمية لتصدر في نسخة ثانية أكثر نضجًا واتساقًا. وفي خطوة عملية، تم استخراج ما يقارب 28 ألف مصطلح من خمسة معاجم متخصصة في المعلوماتية، لتكوين قاعدة معرفية صلبة. كما حظي المشروع بتمويل مجتمعي قدره 300 دولار، لم يكن رقمًا كبيرًا بقدر ما كان رسالة ثقة بأن الفكرة تستحق أن تُستكمل." },
-                                    { date: "جانفي – مارس 2026", phase: "تفعيل", dot: "bg-amber-500", badge: "bg-amber-50 text-amber-700 border-amber-100", title: "التقنية في خدمة اللغة", desc: "انتقل المشروع من التأصيل النظري إلى التفعيل العملي، عبر تطوير محرك بحث مدعوم بتقنيات الذكاء الاصطناعي، يربط المصطلح بسياقه، ويُيسر الوصول إليه، ويمنح المستخدم تجربة بحث دقيقة وفعالة." },
-                                    { date: "04 أفريل 2026", phase: "انطلاق", dot: "bg-rose-500", badge: "bg-rose-50 text-rose-700 border-rose-100", title: "عام من التأسيس", desc: "في الذكرى الأولى لانطلاق المشروع، تم نشر النسخة الثانية من الورقة المفاهيمية، إلى جانب الإطلاق الرسمي لمحرك البحث. لم يكن ذلك مجرد احتفاء زمني، بل إعلان انتقال من مرحلة التأسيس إلى مرحلة التأثير." },
-                                ].map((item, i) => (
-                                    <div key={i} className="relative flex items-start gap-5 pr-14">
-                                        {/* Number dot — sits on the line */}
-                                        <div className={`absolute right-0 top-0 w-10 h-10 rounded-xl ${item.dot} flex items-center justify-center shadow-md z-10`}>
-                                            <span className="text-white font-black text-sm">{i + 1}</span>
-                                        </div>
-
-                                        {/* Card */}
-                                        <div className="flex-1 bg-white rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all p-5">
-                                            <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                                <span className={`text-xs font-black px-2.5 py-1 rounded-full border ${item.badge}`}>{item.phase}</span>
-                                                <span className="text-xs text-slate-400 font-medium">{item.date}</span>
-                                            </div>
-                                            <h4 className="font-black text-slate-800 text-base mb-1.5">{item.title}</h4>
-                                            <p className="text-slate-500 text-sm leading-relaxed font-medium">{item.desc}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
 
                 {/* FAQ Section */}
@@ -640,7 +542,7 @@ export default function LandingSearchPage() {
                                 
                                 <p className="text-blue-100 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
                                     يهدف هذا المشروع إلى سد الفجوة بين المصطلحات العلمية وقبولها الفعلي. 
-                                    مساهمتك تساعدنا في تغطية تكاليف الذكاء الاصطناعي، الخوادم، وتطوير قواعد بيانات أوسع لحماية الهوية اللغوية في عصر التقنية.
+                                    مساهمتك تساعدنا في تغطية تكاليف الخوادم وتطوير قواعد بيانات أوسع لحماية الهوية اللغوية في عصر التقنية.
                                 </p>
                                 
                                 <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -716,7 +618,7 @@ export default function LandingSearchPage() {
                                     </div>
                                 </div>
                                 <p className="text-slate-400/90 text-base leading-relaxed font-medium max-w-md">
-                                    مشروع بحثي مفتوح المصدر يسعى لسد الفجوة بين التوحيد المصطلحي والقبولية الاستعمالية في حقل المعلوماتية العربية، مدعوم بالذكاء الاصطناعي.
+                                    مشروع بحثي مفتوح المصدر يسعى لسد الفجوة بين التوحيد المصطلحي والقبولية الاستعمالية في حقل المعلوماتية العربية.
                                 </p>
                             </div>
 
@@ -725,17 +627,23 @@ export default function LandingSearchPage() {
                                 <h4 className="font-bold text-white text-lg">روابط سريعة</h4>
                                 <ul className="space-y-3">
                                     {[
-                                        { label: "رحلة المشروع", href: "#timeline" },
                                         { label: "الأسئلة الشائعة", href: "#faq" },
+                                        { label: "بوابة المطورين", href: route('developers'), isRoute: true },
                                         { label: "تواصل معنا", href: "#contact" },
-
-                                        { label: "شكر وتقدير", href: route('thanks') },
+                                        { label: "شكر وتقدير", href: route('thanks'), isRoute: true },
                                     ].map((link, i) => (
                                         <li key={i}>
-                                            <a href={link.href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group">
-                                                <span className="w-1 h-1 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
-                                                <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
-                                            </a>
+                                            {link.isRoute ? (
+                                                <Link href={link.href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+                                                    <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                                                </Link>
+                                            ) : (
+                                                <a href={link.href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+                                                    <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                                                </a>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>

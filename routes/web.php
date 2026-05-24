@@ -13,11 +13,18 @@ Route::get("/paper", function () {
 //     return inertia("ChatV2/Award");
 // })->name("award");
 
-Route::get("/changelog", function () {
-    return inertia("ChatV2/Changelog");
-})->name("changelog");
 
-Route::get("/search", [ChatV2Controller::class, "search"])->middleware(['auth', 'approved'])->name("search.results");
+
+Route::get("/developers", function () {
+    return inertia("ChatV2/Developers");
+})->name("developers");
+
+
+Route::get("/search", [ChatV2Controller::class, "search"])->name("search.results");
+
+Route::get("/contact", function () {
+    return inertia("ChatV2/ContactAcademies");
+})->name("contact");
 
 Route::get("/thanks", function () {
     return inertia("Thanks");

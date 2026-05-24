@@ -45,7 +45,7 @@ class ChatV2Controller extends Controller
         }
         
         $q = $request->query('q');
-        $initialChartData = null;
+        $results = [];
         
         if (!empty($q)) {
             $results = $this->searchService->searchTerms($q, false, true);
@@ -53,7 +53,7 @@ class ChatV2Controller extends Controller
 
         return Inertia::render('ChatV2/Results', [
             'q' => $q,
-            'initialChartData' => $initialChartData
+            'results' => $results
         ]);
     }
 

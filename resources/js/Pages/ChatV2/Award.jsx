@@ -290,19 +290,23 @@ export default function Award() {
                                 <h4 className="font-bold text-white text-lg">روابط سريعة</h4>
                                 <ul className="space-y-3">
                                     {[
-                                        { label: "المنهجية العلمية", href: "/#methodology" },
-                                        { label: "رحلة المشروع", href: "/#timeline" },
-                                        { label: "مجتمع المعرفة", href: "/#community" },
+                                        { label: "الأسئلة الشائعة", href: "/#faq" },
+                                        { label: "بوابة المطورين", href: route('developers'), isRoute: true },
                                         { label: "تواصل معنا", href: "/#contact" },
-                                        { label: "جائزة يوغرطة", href: route('award') },
-
-                                        { label: "شكر وتقدير", href: route('thanks') },
+                                        { label: "شكر وتقدير", href: route('thanks'), isRoute: true },
                                     ].map((link, i) => (
                                         <li key={i}>
-                                            <a href={link.href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group">
-                                                <span className="w-1 h-1 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
-                                                <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
-                                            </a>
+                                            {link.isRoute ? (
+                                                <Link href={link.href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+                                                    <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                                                </Link>
+                                            ) : (
+                                                <a href={link.href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+                                                    <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                                                </a>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>

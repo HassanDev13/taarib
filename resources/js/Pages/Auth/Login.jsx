@@ -138,14 +138,7 @@ export default function Login() {
                             </Button>
                         </form>
 
-                        <div className="text-center">
-                            <p className="text-sm font-medium text-slate-500">
-                                ليس لديك حساب؟{' '}
-                                <Link href={route('register')} className="text-blue-600 hover:text-blue-700 font-bold hover:underline transition-all">
-                                    سجل الآن
-                                </Link>
-                            </p>
-                        </div>
+
                     </div>
                 </div>
             </div>

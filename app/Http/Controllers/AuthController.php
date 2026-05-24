@@ -15,38 +15,12 @@ class AuthController extends Controller
 
     public function showRegister()
     {
-        $specialities = \App\Models\Speciality::all();
-        return Inertia::render('Auth/Register', [
-            'specialities' => $specialities
-        ]);
+        abort(404);
     }
 
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'linkedin_url' => 'required|url|max:255',
-            'speciality_id' => 'required|exists:specialities,id',
-            'years_of_experience' => 'required|integer|min:0|max:100',
-            'about_me' => 'required|string|max:1000',
-        ]);
-
-        $user = \App\Models\User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'linkedin_url' => $validated['linkedin_url'],
-            'speciality_id' => $validated['speciality_id'],
-            'years_of_experience' => $validated['years_of_experience'],
-            'about_me' => $validated['about_me'],
-            'status' => 'pending',
-        ]);
-
-        Auth::login($user);
-
-        return redirect()->route('waiting');
+        abort(404);
     }
 
     public function login(Request $request)

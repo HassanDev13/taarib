@@ -143,10 +143,22 @@ class SearchService
                     $groupedData[$groupKey]['resources'][$resourceId]['arabic_term_details'][$arTermKey]['count']++;
                     $groupedData[$groupKey]['resources'][$resourceId]['arabic_term_details'][$arTermKey]['term_ids'][] = $term->id;
                     
-                    // Track page numbers
+                    // Track page numbers and IDs
+                    $pageId = $term->resourcePage->id ?? 0;
                     $pageNumber = $term->resourcePage->page_number ?? 0;
-                    if (!in_array($pageNumber, $groupedData[$groupKey]['resources'][$resourceId]['arabic_term_details'][$arTermKey]['pages'])) {
-                        $groupedData[$groupKey]['resources'][$resourceId]['arabic_term_details'][$arTermKey]['pages'][] = $pageNumber;
+                    
+                    $foundPage = false;
+                    foreach ($groupedData[$groupKey]['resources'][$resourceId]['arabic_term_details'][$arTermKey]['pages'] as $p) {
+                        if ($p['page_number'] === $pageNumber) {
+                            $foundPage = true;
+                            break;
+                        }
+                    }
+                    if (!$foundPage) {
+                        $groupedData[$groupKey]['resources'][$resourceId]['arabic_term_details'][$arTermKey]['pages'][] = [
+                            'id' => $pageId,
+                            'page_number' => $pageNumber,
+                        ];
                     }
                     
                     // Sum confidence for averaging
@@ -184,15 +196,13 @@ class SearchService
                         ? round($arDetail['confidence_sum'] / $arDetail['count'], 1) 
                         : 0;
                     
-                    // Sort pages
-                    sort($arDetail['pages']);
+                    // Sort pages by page_number
+                    usort($arDetail['pages'], function($a, $b) {
+                        return $a['page_number'] - $b['page_number'];
+                    });
                     
                     // Limit pages to save tokens
-                    $pageCount = count($arDetail['pages']);
-                    $displayPages = array_slice($arDetail['pages'], 0, 5); // Reduce page limit for compact prompt
-                    if ($pageCount > 5) {
-                        $displayPages[] = '...';
-                    }
+                    $displayPages = array_slice($arDetail['pages'], 0, 5);
                     
                     $arabicTermDetails[] = [
                         'arabic_term' => $arDetail['arabic_term'],
@@ -259,8 +269,17 @@ class SearchService
             $result[] = $group;
         }
         
-        // Sort by total count descending
-        usort($result, function($a, $b) {
+        $normalizedSearch = strtolower(trim($search));
+
+        // Sort by exact match first, then total count descending
+        usort($result, function($a, $b) use ($normalizedSearch) {
+            $aExact = ($a['normalized_term_en'] === $normalizedSearch || trim($a['normalized_term_ar']) === $normalizedSearch) ? 1 : 0;
+            $bExact = ($b['normalized_term_en'] === $normalizedSearch || trim($b['normalized_term_ar']) === $normalizedSearch) ? 1 : 0;
+
+            if ($aExact !== $bExact) {
+                return $bExact - $aExact;
+            }
+
             return $b['total_count'] - $a['total_count'];
         });
 
