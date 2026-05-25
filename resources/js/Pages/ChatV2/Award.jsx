@@ -293,7 +293,6 @@ export default function Award() {
                                         { label: "الأسئلة الشائعة", href: "/#faq" },
                                         { label: "بوابة المطورين", href: route('developers'), isRoute: true },
                                         { label: "تواصل معنا", href: "/#contact" },
-                                        { label: "شكر وتقدير", href: route('thanks'), isRoute: true },
                                     ].map((link, i) => (
                                         <li key={i}>
                                             {link.isRoute ? (

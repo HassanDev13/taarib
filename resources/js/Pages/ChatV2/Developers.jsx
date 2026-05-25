@@ -109,18 +109,18 @@ export default function Developers() {
                             {/* Parameters */}
                             <div className="space-y-3">
                                 <h2 className="text-base font-bold text-slate-800">المعاملات (Parameters)</h2>
-                                <div className="border border-slate-200/80 rounded-2xl overflow-hidden text-xs">
-                                    <div className="bg-slate-50 p-4 border-b border-slate-200 grid grid-cols-4 font-bold text-slate-700">
+                                <div className="border border-slate-200/80 rounded-2xl overflow-hidden text-xs sm:text-sm">
+                                    <div className="bg-slate-50 p-4 sm:px-6 border-b border-slate-200 grid grid-cols-5 gap-4 font-bold text-slate-700">
                                         <div>المعامل</div>
                                         <div>النوع</div>
                                         <div>الحالة</div>
                                         <div className="col-span-2">الوصف</div>
                                     </div>
-                                    <div className="p-4 grid grid-cols-4 items-center">
+                                    <div className="p-4 sm:px-6 grid grid-cols-5 gap-4 items-center">
                                         <div className="font-mono font-bold text-blue-600">q</div>
                                         <div className="font-mono text-slate-500">string</div>
                                         <div className="text-amber-600 font-bold">مطلوب</div>
-                                        <div className="col-span-2 text-slate-600 font-medium">الكلمة أو العبارة (إنجليزية أو عربية) المراد البحث عنها.</div>
+                                        <div className="col-span-2 text-slate-600 font-medium leading-relaxed">الكلمة أو العبارة (إنجليزية أو عربية) المراد البحث عنها.</div>
                                     </div>
                                 </div>
                             </div>

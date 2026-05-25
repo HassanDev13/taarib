@@ -228,6 +228,11 @@ export default function LandingSearchPage() {
 
                         {/* Desktop links */}
                         <div className="hidden md:flex items-center gap-1">
+                            {auth?.user && (
+                                <Link href={route('chat.index')} className="relative px-4 py-2 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors rounded-xl bg-blue-50/50 hover:bg-blue-100 border border-blue-100">
+                                    بحث بالذكاء الاصطناعي
+                                </Link>
+                            )}
                             <a href="#faq" className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
                                 الأسئلة الشائعة
                             </a>
@@ -258,6 +263,16 @@ export default function LandingSearchPage() {
                     {mobileMenuOpen && (
                         <div className="absolute top-[72px] left-4 right-4 max-w-4xl mx-auto bg-white/95 backdrop-blur-2xl border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-900/10 overflow-hidden">
                             <div className="p-2 space-y-0.5">
+                                {auth?.user && (
+                                    <Link
+                                        href={route('chat.index')}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-blue-700 bg-blue-50/50 font-bold text-sm hover:bg-blue-100 hover:text-blue-800 transition-colors border border-blue-100"
+                                    >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                                        بحث بالذكاء الاصطناعي
+                                    </Link>
+                                )}
                                 <a
                                     href="#faq"
                                     onClick={() => setMobileMenuOpen(false)}
@@ -630,7 +645,6 @@ export default function LandingSearchPage() {
                                         { label: "الأسئلة الشائعة", href: "#faq" },
                                         { label: "بوابة المطورين", href: route('developers'), isRoute: true },
                                         { label: "تواصل معنا", href: "#contact" },
-                                        { label: "شكر وتقدير", href: route('thanks'), isRoute: true },
                                     ].map((link, i) => (
                                         <li key={i}>
                                             {link.isRoute ? (
