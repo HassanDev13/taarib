@@ -71,7 +71,7 @@ export default function ContactAcademies() {
     return (
         <>
             <Head title="بوابة التواصل لمجامع اللغة العربية والهيئات الأكاديمية - تعريب" />
-            <div className="min-h-screen bg-slate-50 text-slate-900 font-arabic selection:bg-blue-100 selection:text-blue-900 pb-20" dir="rtl">
+            <div className="min-h-screen bg-slate-50 text-slate-900 font-arabic selection:bg-blue-100 selection:text-blue-900" dir="rtl">
                 
                 {/* Navbar */}
                 <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4">
