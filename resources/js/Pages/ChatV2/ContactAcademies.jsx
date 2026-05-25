@@ -271,6 +271,88 @@ export default function ContactAcademies() {
 
                     </div>
                 </main>
+
+                {/* Footer Section */}
+                <footer className="bg-slate-950 text-slate-300 border-t border-slate-800/50 relative overflow-hidden" dir="rtl">
+                    {/* Decorative background blobs */}
+                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2 mix-blend-screen" />
+                    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-900/10 blur-[100px] rounded-full pointer-events-none translate-y-1/2 -translate-x-1/2 mix-blend-screen" />
+
+                    <div className="container mx-auto px-6 py-16 md:py-20 max-w-6xl relative z-10">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 bg-transparent">
+                            
+                            {/* Brand Column */}
+                            <div className="md:col-span-5 space-y-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-blue-900/20 ring-1 ring-white/10">
+                                        <img src="/images/logo.png" alt="Logo" className="h-8 w-8 object-contain brightness-0 invert" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-black text-2xl text-white tracking-tight">تعريب</h3>
+                                        <p className="text-[11px] text-blue-400 font-bold tracking-widest uppercase opacity-90 text-right">مبادرة لتوحيد المصطلحات</p>
+                                    </div>
+                                </div>
+                                <p className="text-slate-400/90 text-base leading-relaxed font-medium max-w-md">
+                                    مشروع بحثي مفتوح المصدر يسعى لسد الفجوة بين التوحيد المصطلحي والقبولية الاستعمالية في حقل المعلوماتية العربية.
+                                </p>
+                            </div>
+
+                            {/* Links Column */}
+                            <div className="md:col-span-3 md:col-start-7 space-y-6">
+                                <h4 className="font-bold text-white text-lg">روابط سريعة</h4>
+                                <ul className="space-y-3">
+                                    {[
+                                        { label: "الأسئلة الشائعة", href: "/#faq" },
+                                        { label: "بوابة المطورين", href: route('developers'), isRoute: true },
+                                        { label: "تواصل معنا", href: "/#contact" },
+                                    ].map((link, i) => (
+                                        <li key={i}>
+                                            {link.isRoute ? (
+                                                <Link href={link.href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+                                                    <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                                                </Link>
+                                            ) : (
+                                                <a href={link.href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+                                                    <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                                                </a>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div className="md:col-span-3 space-y-4">
+                                <h4 className="font-bold text-white text-lg">تواصل معنا</h4>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    نسعد باستقبال استفساراتكم ومقترحاتكم لتطوير هذا المشروع.
+                                </p>
+                                <a href="/#contact" className="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors border border-slate-700 w-full sm:w-auto">
+                                    <Mail className="w-4 h-4" />
+                                    اتصل بنا
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Separator */}
+                        <div className="h-px bg-gradient-to-r from-transparent via-slate-800 to-transparent my-10 opacity-70" />
+
+                        {/* Bottom Bar */}
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-slate-500">
+                            <p className="flex items-center gap-1.5">
+                                <span>© 2026 تعريب.</span>
+                                <span className="hidden sm:inline text-slate-700">|</span>
+                                <span>جميع الحقوق محفوظة.</span>
+                            </p>
+                            <div className="flex items-center gap-1.5 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-800">
+                                <span>صُنع بـ</span>
+                                <span className="text-red-500 animate-pulse">❤️</span>
+                                <span>من أجل اللغة العربية</span>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
             </div>
         </>
     );

@@ -585,7 +585,7 @@ export default function LandingSearchPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                             
                             {/* Text Content */}
-                            <div className="space-y-8 order-2 lg:order-1 text-right">
+                            <div className="space-y-8 text-right">
                                 <div className="space-y-4">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100 w-fit">
                                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
@@ -602,7 +602,7 @@ export default function LandingSearchPage() {
                             </div>
 
                             {/* Contact Form Card */}
-                            <div className="order-1 lg:order-2 bg-white rounded-[2.5rem] p-8 md:p-10 shadow-2xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
+                            <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-2xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
                                 <div className="relative z-10">
                                     <ContactForm />
                                 </div>
