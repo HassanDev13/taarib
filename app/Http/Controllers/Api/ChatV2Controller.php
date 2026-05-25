@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\SearchService;
+use App\Services\AnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use OpenAI\Laravel\Facades\OpenAI;
@@ -46,9 +47,25 @@ class ChatV2Controller extends Controller
         
         $q = $request->query('q');
         $results = [];
+        $hadResults = false;
         
         if (!empty($q)) {
             $results = $this->searchService->searchTerms($q, false, true);
+            $hadResults = !empty($results);
+            
+            // Track the search query
+            try {
+                $analytics = app(AnalyticsService::class);
+                $analytics->trackSearchQuery(
+                    $request,
+                    $q,
+                    is_array($results) ? count($results) : 0,
+                    'semantic',
+                    $hadResults
+                );
+            } catch (\Exception $e) {
+                Log::error('Analytics tracking error: ' . $e->getMessage());
+            }
         }
 
         return Inertia::render('ChatV2/Results', [

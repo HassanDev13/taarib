@@ -23,5 +23,38 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
+        
+        {{-- Taarib Analytics Tracking --}}
+        <script>
+        (function() {
+            const pageLoadTime = Date.now();
+            let maxScroll = 0;
+            
+            // Track scroll depth
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                if (docHeight > 0) {
+                    maxScroll = Math.max(maxScroll, Math.round((scrollTop / docHeight) * 100));
+                }
+            }, { passive: true });
+            
+            // Track time on page when leaving
+            window.addEventListener('beforeunload', function() {
+                const timeOnPage = Math.round((Date.now() - pageLoadTime) / 1000);
+                const data = {
+                    path: window.location.pathname + window.location.search,
+                    title: document.title,
+                    time_on_page: timeOnPage,
+                    scroll_depth: maxScroll
+                };
+                
+                // Send via beacon (doesn't block page unload)
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('/analytics-ping', JSON.stringify(data));
+                }
+            });
+        })();
+        </script>
     </body>
 </html>

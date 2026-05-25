@@ -23,3 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/term_suggestions', [TermSuggestionController::class, 'store']); // Create
     Route::post('/term_suggestions/{id}/vote', [TermSuggestionController::class, 'vote']); // Vote
 });
+
+// Analytics API for automated reporting
+use App\Http\Controllers\AnalyticsController;
+Route::get('/analytics/report', [AnalyticsController::class, 'report']);
+Route::get('/analytics/failed-queries', [AnalyticsController::class, 'failedQueries']);

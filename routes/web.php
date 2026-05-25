@@ -141,3 +141,45 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/settings', [UserSettingsController::class, 'update'])->name('settings.update');
     Route::delete('/settings', [UserSettingsController::class, 'destroy'])->name('settings.destroy');
 });
+
+// Analytics Dashboard (admin only)
+Route::middleware(['auth', 'approved'])->prefix('analytics')->group(function () {
+    Route::get('/', function () {
+        return inertia('Analytics/Index', [
+            'stats' => app(\App\Services\AnalyticsService::class)->generateWeeklyReport(7)
+        ]);
+    })->name('analytics.index');
+});
+
+// Analytics JSON API for automated reporting (Naruto reads this)
+use App\Http\Controllers\AnalyticsController;
+Route::get('/analytics-report/{days?}', [AnalyticsController::class, 'report'])->name('analytics.api');
+
+// Analytics ping (time on page, scroll depth from sendBeacon)
+use Illuminate\Http\Request;
+Route::post('/analytics-ping', function (Request $request) {
+    try {
+        $data = json_decode($request->getContent(), true);
+        if (!$data || empty($data['path'])) {
+            return response('', 204);
+        }
+        
+        $visitId = session('analytics_visit_id');
+        if (!$visitId) return response('', 204);
+        
+        $visit = \App\Models\AnalyticsVisit::find($visitId);
+        if (!$visit) return response('', 204);
+        
+        \App\Models\AnalyticsPageView::create([
+            'visit_id' => $visit->id,
+            'path' => $data['path'],
+            'title' => $data['title'] ?? '',
+            'time_on_page' => min($data['time_on_page'] ?? 0, 3600), // max 1 hour
+            'scroll_depth' => min($data['scroll_depth'] ?? 0, 100),
+            'viewed_at' => now(),
+        ]);
+    } catch (\Exception $e) {
+        // Silent fail - don't break the user experience
+    }
+    return response('', 204);
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);

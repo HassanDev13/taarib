@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\CheckMaintenanceMode::class,
+            \App\Http\Middleware\TrackAnalytics::class,
         ]);
         $middleware->alias([
             'approved' => \App\Http\Middleware\CheckUserApproval::class,
