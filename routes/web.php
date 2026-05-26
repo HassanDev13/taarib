@@ -183,3 +183,11 @@ Route::post('/analytics-ping', function (Request $request) {
     }
     return response('', 204);
 })->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+// Library Routes
+use App\Http\Controllers\LibraryController;
+Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+Route::get('/library/upload', [LibraryController::class, 'create'])->name('library.create');
+Route::post('/library/upload', [LibraryController::class, 'store'])->name('library.store');
+Route::get('/library/{book}/download', [LibraryController::class, 'download'])->name('library.download');
+Route::get('/library/{book}/view', [LibraryController::class, 'view'])->name('library.view');

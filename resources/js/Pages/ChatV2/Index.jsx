@@ -233,6 +233,9 @@ export default function LandingSearchPage() {
                                     بحث بالذكاء الاصطناعي
                                 </Link>
                             )}
+                            <Link href={route('library.index')} className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
+                                المكتبة
+                            </Link>
                             <a href="#faq" className="relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50">
                                 الأسئلة الشائعة
                             </a>
@@ -273,6 +276,14 @@ export default function LandingSearchPage() {
                                         بحث بالذكاء الاصطناعي
                                     </Link>
                                 )}
+                                <Link
+                                    href={route('library.index')}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 font-bold text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                    المكتبة
+                                </Link>
                                 <a
                                     href="#faq"
                                     onClick={() => setMobileMenuOpen(false)}

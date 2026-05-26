@@ -47,6 +47,21 @@ return [
             'report' => false,
         ],
 
+        'books' => [
+            'driver' => env('BOOKS_DISK_DRIVER', 'local'),
+            'root' => storage_path('app/public/books'),
+            'url' => env('APP_URL').'/storage/books',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+            // S3 specifics (ignored if local driver)
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'endpoint' => env('AWS_ENDPOINT'),
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
