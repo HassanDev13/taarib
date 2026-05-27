@@ -8,7 +8,7 @@ class UserSettingsController extends Controller
 {
     public function edit(Request $request)
     {
-        $specialities = \App\Models\Speciality::all();
+        $specialities = \App\Models\Speciality::whereNull('parent_id')->with('children')->get();
         return inertia('Settings', [
             'specialities' => $specialities
         ]);

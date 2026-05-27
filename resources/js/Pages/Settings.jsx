@@ -142,8 +142,16 @@ export default function Settings({ specialities }) {
                                             required
                                         >
                                             <option value="">-- اختر التخصص --</option>
-                                            {specialities && specialities.map((spec) => (
-                                                <option key={spec.id} value={spec.id}>{spec.name}</option>
+                                            {specialities && specialities.map((cat) => (
+                                                cat.children?.length > 0 ? (
+                                                    <optgroup key={cat.id} label={cat.name}>
+                                                        {cat.children.map((sub) => (
+                                                            <option key={sub.id} value={sub.id}>{sub.name}</option>
+                                                        ))}
+                                                    </optgroup>
+                                                ) : (
+                                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                                )
                                             ))}
                                         </select>
                                         {errors.speciality_id && <p className="text-sm text-red-500 font-bold">{errors.speciality_id}</p>}

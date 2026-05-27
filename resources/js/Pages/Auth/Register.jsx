@@ -170,8 +170,12 @@ export default function Register({ specialities }) {
                                         required
                                     >
                                         <option value="" disabled>اختر تخصصك</option>
-                                        {specialities.map(sp => (
-                                            <option key={sp.id} value={sp.id}>{sp.name}</option>
+                                        {specialities.map(cat => (
+                                            <optgroup key={cat.id} label={cat.name}>
+                                                {cat.children?.map(sub => (
+                                                    <option key={sub.id} value={sub.id}>{sub.name}</option>
+                                                ))}
+                                            </optgroup>
                                         ))}
                                     </select>
                                     <Briefcase className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />

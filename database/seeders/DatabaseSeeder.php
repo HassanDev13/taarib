@@ -37,6 +37,10 @@ class DatabaseSeeder extends Seeder
             'password' => 'password', // Default password, should be changed after first login
         ]);
 
-        $this->call(SettingSeeder::class);
+        $this->call([
+            SettingSeeder::class,
+            SpecialitySeeder::class,
+            BookCategorySeeder::class,
+        ]);
     }
 }
