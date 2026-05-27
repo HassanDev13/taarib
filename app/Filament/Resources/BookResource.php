@@ -26,9 +26,10 @@ class BookResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('author')
                     ->maxLength(255),
-                Forms\Components\Select::make('book_category_id')
-                    ->relationship('category', 'name')
-                    ->label('Category')
+                Forms\Components\Select::make('categories')
+                    ->multiple()
+                    ->relationship('categories', 'name')
+                    ->label('Categories')
                     ->required(),
                 Forms\Components\FileUpload::make('file_path')
                     ->label('PDF File')
@@ -59,10 +60,9 @@ class BookResource extends Resource
                 Tables\Columns\TextColumn::make('author')
                     ->searchable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('Category')
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->label('Categories')
                     ->searchable()
-                    ->sortable()
                     ->badge(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->colors([
@@ -81,9 +81,10 @@ class BookResource extends Resource
                         'draft' => 'Draft',
                         'approved' => 'Approved',
                     ]),
-                Tables\Filters\SelectFilter::make('book_category_id')
-                    ->relationship('category', 'name')
-                    ->label('Category'),
+                Tables\Filters\SelectFilter::make('categories')
+                    ->relationship('categories', 'name')
+                    ->multiple()
+                    ->label('Categories'),
             ])
             ->recordActions([
                 \Filament\Actions\EditAction::make(),

@@ -3,10 +3,10 @@ import { Head, Link, useForm, router } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import { 
     BookOpen, Upload, Download, Search, ArrowLeft, 
-    FileText, User, X, Loader2, CheckCircle2, AlertCircle, AlertTriangle, Eye
+    FileText, User, ChevronDown, ChevronUp, Eye, X
 } from "lucide-react";
 
-export default function LibraryIndex({ books, categories, currentCategoryId, currentSearch, flash, errors: pageErrors }) {
+export default function LibraryIndex({ books, categories, currentCategoryId, currentSearch }) {
     const [searchQuery, setSearchQuery] = useState(currentSearch || "");
 
     const handleSearch = (e) => {
@@ -73,10 +73,10 @@ export default function LibraryIndex({ books, categories, currentCategoryId, cur
                             </Link>
                         </div>
 
-                        <div className="flex flex-col lg:flex-row gap-8">
+                        <div className="flex flex-col lg:flex-row gap-12">
                             
                             {/* Sidebar Filters */}
-                            <div className="lg:w-64 shrink-0 space-y-6">
+                            <div className="lg:w-80 xl:w-96 shrink-0 space-y-6">
                                 {/* Search */}
                                 <form onSubmit={handleSearch} className="relative">
                                     <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -91,27 +91,33 @@ export default function LibraryIndex({ books, categories, currentCategoryId, cur
                                     />
                                 </form>
 
-                                <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-900/5 p-5 sticky top-28">
-                                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">التصنيفات</h3>
-                                    <div className="space-y-1">
+                                <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-900/5 p-6 sticky top-28">
+                                    <h3 className="text-lg font-black text-slate-800 uppercase tracking-widest mb-6">التصنيفات</h3>
+                                    <div className="space-y-3">
                                         <button 
                                             onClick={() => handleCategoryClick(null)}
-                                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-colors ${!currentCategoryId ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50'}`}
+                                            className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-base font-black transition-colors ${!currentCategoryId ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent hover:border-slate-200'}`}
                                         >
                                             الكل
                                         </button>
-                                        {categories.map(cat => (
-                                            <button 
-                                                key={cat.id}
-                                                onClick={() => handleCategoryClick(cat.id)}
-                                                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-colors ${currentCategoryId === cat.id ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50'}`}
-                                            >
-                                                <span className="truncate">{cat.name}</span>
-                                                {cat.books_count > 0 && (
-                                                    <span className="bg-white/60 text-xs px-2 py-0.5 rounded-full border border-slate-200/60 shadow-sm">{cat.books_count}</span>
-                                                )}
-                                            </button>
-                                        ))}
+                                        
+                                        <div className="max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent space-y-3">
+                                            {categories.map(category => {
+                                                const isSelected = currentCategoryId == category.id;
+                                                return (
+                                                    <button 
+                                                        key={category.id}
+                                                        onClick={() => handleCategoryClick(category.id)}
+                                                        className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-base font-black transition-all ${isSelected ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent hover:border-slate-200'}`}
+                                                    >
+                                                        <span className="truncate flex-1 text-right">{category.name}</span>
+                                                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${isSelected ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                                                            {category.books_count || 0}
+                                                        </span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -132,13 +138,28 @@ export default function LibraryIndex({ books, categories, currentCategoryId, cur
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                         {books.map(book => (
                                             <div key={book.id} className="bg-white rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-900/5 p-6 flex flex-col hover:border-blue-200 hover:shadow-xl hover:-translate-y-1 transition-all group animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                                <div className="flex items-start justify-between gap-4 mb-6">
+                                                <div className="flex items-start justify-between gap-4 mb-5">
                                                     <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
                                                         <FileText className="w-6 h-6" />
                                                     </div>
-                                                    <span className="bg-slate-50 text-slate-500 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-slate-100">
-                                                        {book.category?.name || 'بدون تصنيف'}
-                                                    </span>
+                                                    <div className="flex flex-wrap gap-1.5 justify-end">
+                                                        {book.categories && book.categories.length > 0 ? (
+                                                            book.categories.slice(0, 2).map(cat => (
+                                                                <span key={cat.id} className="bg-slate-50 text-slate-500 text-[10px] font-bold px-2 py-1 rounded-md border border-slate-100 truncate max-w-[100px]">
+                                                                    {cat.name}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="bg-slate-50 text-slate-500 text-[10px] font-bold px-2 py-1 rounded-md border border-slate-100">
+                                                                بدون تصنيف
+                                                            </span>
+                                                        )}
+                                                        {book.categories && book.categories.length > 2 && (
+                                                            <span className="bg-slate-50 text-slate-500 text-[10px] font-bold px-1.5 py-1 rounded-md border border-slate-100">
+                                                                +{book.categories.length - 2}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 
                                                 <h3 className="text-xl font-black text-slate-800 mb-2 line-clamp-2 leading-snug group-hover:text-blue-700 transition-colors">

@@ -14,10 +14,12 @@ class LibraryController extends Controller
         $categoryId = $request->query('category_id');
         $search = $request->query('search');
         
-        $query = Book::with('category')->where('status', 'approved');
+        $query = Book::with('categories')->where('status', 'approved');
         
         if ($categoryId) {
-            $query->where('book_category_id', $categoryId);
+            $query->whereHas('categories', function($q) use ($categoryId) {
+                $q->where('book_categories.id', $categoryId);
+            });
         }
         
         if ($search) {
@@ -29,7 +31,7 @@ class LibraryController extends Controller
         
         $books = $query->latest()->get();
         
-        $categories = \App\Models\BookCategory::withCount(['books' => function($q) {
+        $categories = \App\Models\BookCategory::with('children')->whereNull('parent_id')->withCount(['books' => function($q) {
             $q->where('status', 'approved');
         }])->get();
 
@@ -43,7 +45,7 @@ class LibraryController extends Controller
 
     public function create()
     {
-        $categories = \App\Models\BookCategory::all();
+        $categories = \App\Models\BookCategory::with('children')->whereNull('parent_id')->get();
 
         return Inertia::render('Library/Upload', [
             'categories' => $categories,
@@ -55,7 +57,9 @@ class LibraryController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'nullable|string|max:255',
-            'book_category_id' => 'required|exists:book_categories,id',
+            'uploader_name' => 'nullable|string|max:255',
+            'category_ids' => 'required|array|min:1',
+            'category_ids.*' => 'exists:book_categories,id',
             'file' => 'required|file|mimes:pdf|max:102400', // max 100MB
         ]);
 
@@ -73,15 +77,17 @@ class LibraryController extends Controller
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('uploads', 'books');
 
-            Book::create([
+            $book = Book::create([
                 'title' => $request->title,
                 'author' => $request->author,
-                'book_category_id' => $request->book_category_id,
+                'uploader_name' => $request->uploader_name,
                 'file_path' => $path,
                 'status' => 'draft',
                 'user_id' => auth()->id(), // null if not logged in
                 'ip_address' => $ip,
             ]);
+
+            $book->categories()->sync($request->category_ids);
 
             return back()->with('success', 'thank_you');
         }

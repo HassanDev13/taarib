@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BookCategory extends Model
@@ -23,9 +24,9 @@ class BookCategory extends Model
         return $this->hasMany(BookCategory::class, 'parent_id');
     }
 
-    public function books(): HasMany
+    public function books(): BelongsToMany
     {
-        return $this->hasMany(Book::class, 'book_category_id');
+        return $this->belongsToMany(Book::class, 'book_book_category');
     }
 
     public function scopeCategories($query)

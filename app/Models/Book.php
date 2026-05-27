@@ -18,6 +18,7 @@ class Book extends Model
         'status',
         'user_id',
         'ip_address',
+        'uploader_name',
     ];
 
     public function user(): BelongsTo
@@ -25,8 +26,8 @@ class Book extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function category(): BelongsTo
+    public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsTo(BookCategory::class, 'book_category_id');
+        return $this->belongsToMany(BookCategory::class, 'book_book_category');
     }
 }
