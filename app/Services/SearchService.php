@@ -10,13 +10,13 @@ class SearchService
     /**
      * Search for terms and return grouped results.
      */
-    public function searchTerms(string $search, bool $exactMatch = false, bool $smartMode = false): array
+    public function searchTerms(string $search, bool $exactMatch = false, bool $smartMode = false, ?string $extractionTool = 'flash-lite'): array
     {
         if (empty($search)) {
             return [];
         }
 
-        $result = $this->performSearch($search, $exactMatch, $smartMode);
+        $result = $this->performSearch($search, $exactMatch, $smartMode, $extractionTool);
         
         // If no results and it's a composition search of multiple words
         if (empty($result) && str_contains(trim($search), ' ')) {
@@ -25,7 +25,7 @@ class SearchService
             
             foreach ($words as $word) {
                 if (mb_strlen($word) > 2) {
-                    $wordRes = $this->performSearch($word, $exactMatch, $smartMode);
+                    $wordRes = $this->performSearch($word, $exactMatch, $smartMode, $extractionTool);
                     if (!empty($wordRes)) {
                         $compositionResults[$word] = $wordRes;
                     }
@@ -45,11 +45,14 @@ class SearchService
         return $result;
     }
 
-    private function performSearch(string $search, bool $exactMatch, bool $smartMode): array
+    private function performSearch(string $search, bool $exactMatch, bool $smartMode, ?string $extractionTool): array
     {
 
         // Get all terms matching the search (case-insensitive)
         $query = Term::query()
+            ->when($extractionTool && $extractionTool !== 'all', function ($q) use ($extractionTool) {
+                return $q->where('extraction_tool', $extractionTool);
+            })
             ->with(['resourcePage.resource'])
             ->where(function ($q) use ($search, $exactMatch) {
                 if ($exactMatch) {

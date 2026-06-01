@@ -22,6 +22,7 @@ class SearchController extends Controller
     public function search(Request $request): JsonResponse
     {
         $search = $request->input('q', $request->input('search', ''));
+        $extractionTool = $request->input('extraction_tool', 'flash-lite');
         
         if (empty($search)) {
             return response()->json([
@@ -30,7 +31,7 @@ class SearchController extends Controller
             ]);
         }
 
-        $result = $this->searchService->searchTerms($search, false, true);
+        $result = $this->searchService->searchTerms($search, false, true, $extractionTool);
 
         return response()->json([
             'data' => $result,

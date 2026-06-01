@@ -225,6 +225,7 @@ class ProcessPageForGPTJob implements ShouldQueue
                     "term_en" => $term["term_en"],
                     "term_ar" => $term["term_ar"],
                     "confidence_level" => $term["confidence_level"],
+                    "extraction_tool" => "google_vision",
                 ]);
             }
 

@@ -22,6 +22,7 @@ class Term extends Model
         "width",
         "height",
         "status",
+        "extraction_tool",
         "rejection_reason",
         "source_url",
         "source_type",

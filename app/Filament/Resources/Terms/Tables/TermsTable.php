@@ -11,6 +11,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Http\UploadedFile;
 
@@ -34,7 +35,13 @@ class TermsTable
                 TextColumn::make("x")->numeric()->sortable(),
                 TextColumn::make("y")->numeric()->sortable(),
                 TextColumn::make("width")->numeric()->sortable(),
-                TextColumn::make("height")->numeric()->sortable(),
+                TextColumn::make("height")->numeric()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make("extraction_tool")
+                    ->label("Extraction Tool")
+                    ->badge()
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make("status")->badge()->color(
                     fn(string $state): string => match ($state) {
                         "unverified" => "warning",
@@ -52,7 +59,13 @@ class TermsTable
                     ->label("Corrections"),
             ])
             ->filters([
-                //
+                SelectFilter::make('extraction_tool')
+                    ->label('Extraction Tool')
+                    ->options([
+                        'google_vision' => 'Google Vision',
+                        'flash-lite' => 'Gemini Flash Lite',
+                        'gemini' => 'Gemini',
+                    ]),
             ])
             ->recordActions([EditAction::make()])
             ->toolbarActions([

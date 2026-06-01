@@ -5,7 +5,7 @@ namespace App\Actions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use thiagoalessio\TesseractOCR\TesseractOCR;
+use Google\Cloud\Vision\V1\Client\ImageAnnotatorClient;
 use Exception;
 
 class ExtractTermsAction
@@ -24,7 +24,7 @@ class ExtractTermsAction
             ]);
 
             if ($useTesseract) {
-                $text = $this->extractWithTesseract($path, $page);
+                $text = $this->extractWithGoogleVision($path, $page);
             }
 
             if ($useGpt) {
@@ -54,13 +54,18 @@ class ExtractTermsAction
         ];
     }
 
-    protected function extractWithTesseract(string $path, ?int $page): string
+    protected function extractWithGoogleVision(string $path, ?int $page): string
     {
         $fullPath = storage_path('app/private/' . $path);
         $extension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
         $text = '';
 
         try {
+            $credentialsPath = base_path(env('GOOGLE_APPLICATION_CREDENTIALS', 'storage/app/google-credentials.json'));
+            $imageAnnotator = new ImageAnnotatorClient([
+                'credentials' => $credentialsPath
+            ]);
+
             if ($extension === 'pdf') {
                 Log::info('PDF detected — converting to images', ['path' => $fullPath]);
 
@@ -95,9 +100,10 @@ class ExtractTermsAction
                     if (!file_exists($imagePath)) {
                         continue;
                     }
-                    $ocrText = (new TesseractOCR($imagePath))
-                        ->lang('ara+eng')
-                        ->run();
+                    $imageContent = file_get_contents($imagePath);
+                    $response = $imageAnnotator->documentTextDetection($imageContent);
+                    $annotation = $response->getFullTextAnnotation();
+                    $ocrText = $annotation ? $annotation->getText() : '';
                     $text .= "\n" . trim($ocrText);
                     unlink($imagePath);
                 }
@@ -110,25 +116,48 @@ class ExtractTermsAction
             } else {
                 Log::info('Image file detected — starting OCR', ['path' => $fullPath]);
 
-                $text = (new TesseractOCR($fullPath))
-                    ->lang('ara+eng')
-                    ->run();
+                $image = new \Google\Cloud\Vision\V1\Image();
+            $image->setContent(file_get_contents($fullPath));
 
-                $text = trim($text);
+            $feature = (new \Google\Cloud\Vision\V1\Feature())
+                ->setType(\Google\Cloud\Vision\V1\Feature\Type::DOCUMENT_TEXT_DETECTION);
+
+            $annotateRequest = (new \Google\Cloud\Vision\V1\AnnotateImageRequest())
+                ->setImage($image)
+                ->setFeatures([$feature]);
+
+            $batchRequest = (new \Google\Cloud\Vision\V1\BatchAnnotateImagesRequest())
+                ->setRequests([$annotateRequest]);
+
+            $response = $imageAnnotator->batchAnnotateImages($batchRequest);
+            $responses = $response->getResponses();
+
+            $ocrText = '';
+            if (count($responses) > 0) {
+                $annotation = $responses[0]->getFullTextAnnotation();
+                $ocrText = $annotation ? $annotation->getText() : '';
+            }
+
+                $text = trim($ocrText);
 
                 Log::info('Image OCR completed', [
                     'chars_extracted' => strlen($text),
                 ]);
             }
 
+            $imageAnnotator->close();
+
             return $text;
         } catch (Exception $e) {
-            Log::error('Tesseract OCR failed', [
+            if (isset($imageAnnotator)) {
+                $imageAnnotator->close();
+            }
+            Log::error('Google Vision OCR failed', [
                 'path' => $fullPath,
                 'error' => $e->getMessage(),
             ]);
 
-            throw new Exception('Tesseract OCR extraction failed: ' . $e->getMessage());
+            throw new Exception('Google Vision OCR extraction failed: ' . $e->getMessage());
         }
     }
 
