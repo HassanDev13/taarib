@@ -10,7 +10,7 @@ class SearchService
     /**
      * Search for terms and return grouped results.
      */
-    public function searchTerms(string $search, bool $exactMatch = false, bool $smartMode = false, ?string $extractionTool = 'flash-lite'): array
+    public function searchTerms(string $search, bool $exactMatch = false, bool $smartMode = false, ?string $extractionTool = 'tesseract'): array
     {
         if (empty($search)) {
             return [];
@@ -133,10 +133,13 @@ class SearchService
                 
                 // Track Arabic term with its specific term ID and page numbers
                 if ($term->term_ar) {
-                    $arTermKey = $term->term_ar;
+                    // Normalize the Arabic term for grouping by removing "ال" from the beginning of any word
+                    $arTermKey = preg_replace('/(^|\s)ال/u', '$1', trim($term->term_ar));
+                    $arTermKey = preg_replace('/\s+/u', ' ', trim($arTermKey)); // Clean up multiple spaces
+                    
                     if (!isset($groupedData[$groupKey]['resources'][$resourceId]['arabic_term_details'][$arTermKey])) {
                         $groupedData[$groupKey]['resources'][$resourceId]['arabic_term_details'][$arTermKey] = [
-                            'arabic_term' => $term->term_ar,
+                            'arabic_term' => $arTermKey,
                             'count' => 0,
                             'term_ids' => [],
                             'pages' => [],

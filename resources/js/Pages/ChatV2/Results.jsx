@@ -5,6 +5,14 @@ import {
     Search, ArrowLeft, BookOpen, Settings, Zap, Home, Mail, AlertCircle, FileText
 } from "lucide-react";
 
+const formatResourceCount = (count) => {
+    if (count === 1) return "مصدر واحد";
+    if (count === 2) return "مصدرين";
+    if (count >= 3 && count <= 10) return `${count} مصادر`;
+    if (count >= 11) return `${count} مصدراً`;
+    return `${count} مصدر`;
+};
+
 export default function Results({ q, results }) {
     const [query, setQuery] = useState(q || "");
     const { auth } = usePage().props;
@@ -82,16 +90,44 @@ export default function Results({ q, results }) {
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 opacity-60 pointer-events-none" />
 
                                     {/* English Term Header */}
-                                    <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-6 relative z-10">
+                                    <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4 relative z-10">
                                         <div>
                                             <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight font-sans" dir="ltr">
                                                 {group.display_term_en}
                                             </h2>
                                             <p className="text-slate-400 text-xs font-semibold mt-1">
-                                                إجمالي التكرار: {group.total_count} • مصادر مستقلة: {group.resource_count}
+                                                إجمالي التكرار: {group.total_count} • في {formatResourceCount(group.resource_count)}
                                             </p>
                                         </div>
                                         <FileText className="h-5 w-5 text-slate-400" />
+                                    </div>
+
+                                    {/* Consensus Note */}
+                                    <div className="mb-6 relative z-10">
+                                        {(() => {
+                                            const stats = group.global_stats;
+                                            if (!stats || stats.length === 0) return null;
+                                            
+                                            let note = "";
+                                            if (stats.length === 1 && stats[0].resource_count === 1) {
+                                                note = "هذا المصطلح ورد في مصدر واحد فقط، ولا يوجد إجماع موثق عليه من مصادر متعددة بناءً على بياناتنا.";
+                                            } else if (stats.length > 1 && stats[0].resource_count === stats[1].resource_count) {
+                                                note = "تختلف المصادر في ترجمة هذا المصطلح، ولا يوجد اتفاق مطلق على ترجمة واحدة بناءً على بياناتنا.";
+                                            } else if (stats[0].resource_count > 1) {
+                                                note = `أكثر ترجمة متفق عليها بين المصادر هي "${stats[0].term}" (وردت في ${formatResourceCount(stats[0].resource_count)}).`;
+                                            } else {
+                                                note = "لا يوجد إجماع موثق على ترجمة واحدة لهذا المصطلح بناءً على بياناتنا.";
+                                            }
+                                            
+                                            return (
+                                                <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-start gap-2">
+                                                    <span className="text-emerald-500 mt-0.5 text-lg">💡</span>
+                                                    <p className="text-sm font-bold text-emerald-800 leading-relaxed">
+                                                        {note}
+                                                    </p>
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
 
                                     {/* Arabic Translations List */}
@@ -109,7 +145,7 @@ export default function Results({ q, results }) {
                                                             {stat.term}
                                                         </span>
                                                         <span className="text-slate-400 text-xs font-bold">
-                                                            (وردت في {stat.resource_count} {stat.resource_count > 1 ? 'مصادر' : 'مصدر'})
+                                                            (وردت في {formatResourceCount(stat.resource_count)})
                                                         </span>
                                                     </div>
                                                     
