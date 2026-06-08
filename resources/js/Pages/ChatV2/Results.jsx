@@ -4,6 +4,7 @@ import { Button } from "@/Components/ui/button";
 import { 
     Search, ArrowLeft, BookOpen, Settings, Zap, Home, Mail, AlertCircle, FileText
 } from "lucide-react";
+import LexiconAnalysisCard from "@/Components/LexiconAnalysisCard";
 
 const formatResourceCount = (count) => {
     if (count === 1) return "مصدر واحد";
@@ -177,6 +178,11 @@ export default function Results({ q, results }) {
                                                                 </div>
                                                             );
                                                         })}
+                                                    </div>
+
+                                                    {/* Lexicon Analysis Card for this specific Arabic term */}
+                                                    <div className="mt-4">
+                                                        <LexiconAnalysisCard word={stat.term} />
                                                     </div>
                                                 </div>
                                             );

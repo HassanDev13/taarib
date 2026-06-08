@@ -17,6 +17,9 @@ Route::prefix('v1')->group(function () {
 use App\Http\Controllers\Api\ChatController;
 Route::post('/chat', [ChatController::class, 'chat']);
 
+use App\Http\Controllers\Api\LexiconAnalysisController;
+Route::get('/lexicon-analyze', [LexiconAnalysisController::class, 'analyze']);
+
 use App\Http\Controllers\Api\TermSuggestionController;
 Route::get('/term_suggestions', [TermSuggestionController::class, 'index']); // Public view
 Route::middleware('auth:sanctum')->group(function () {

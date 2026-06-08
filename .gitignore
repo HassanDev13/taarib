@@ -25,3 +25,5 @@ Homestead.yaml
 Thumbs.db
 /letsencrypt
 
+# Ignore the local Arabic Lexicons database to avoid tracking large binary files
+arabic_lexicons.db
