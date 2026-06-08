@@ -127,4 +127,12 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsTo(Speciality::class);
     }
+
+    /**
+     * Get the chat sessions for the user.
+     */
+    public function chatSessions()
+    {
+        return $this->hasMany(ChatSession::class);
+    }
 }

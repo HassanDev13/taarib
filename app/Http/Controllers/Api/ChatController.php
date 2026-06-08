@@ -219,8 +219,6 @@ CRITICAL FORMATTING RULES:
 
     private function postProcessContent(string $text): string
     {
-        // Minimal cleanup
-        $text = preg_replace('/\s{2,}/u', ' ', $text);
-        return trim($text);
+        return $text;
     }
 }
