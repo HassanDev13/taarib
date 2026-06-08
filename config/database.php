@@ -45,7 +45,7 @@ return [
 
         'lexicon' => [
             'driver' => 'sqlite',
-            'database' => storage_path('taarib/arabic_lexicon/arabic_lexicons.db'),
+            'database' => env('LEXICON_DB_PATH', storage_path('taarib/arabic_lexicon/arabic_lexicons.db')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
