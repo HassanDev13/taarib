@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\SearchService;
+use App\Models\ChatSession;
+use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use OpenAI\Laravel\Facades\OpenAI;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ChatController extends Controller
 {
@@ -20,9 +21,10 @@ class ChatController extends Controller
         $this->searchService = $searchService;
     }
 
-    public function index(): Response
+    public function index()
     {
-        return Inertia::render('Chat/Index');
+        $sessions = auth()->user()->chatSessions()->orderBy('updated_at', 'desc')->get();
+        return inertia('Chat/Index', ['sessions' => $sessions]);
     }
 
     public function chat(Request $request)
@@ -34,76 +36,67 @@ class ChatController extends Controller
         ]);
 
         $userMessages = $request->input('messages');
-        
-        return new StreamedResponse(function () use ($userMessages) {
-            // Disable output buffering
+        $model = env('OPENAI_MODEL', 'deepseek-chat');
+        $maxToolRounds = 2;
+
+        $chatSession = null;
+        if (auth()->check()) {
+            $sessionId = $request->input('session_id');
+            if ($sessionId) {
+                $chatSession = ChatSession::where('id', $sessionId)->where('user_id', auth()->id())->first();
+            }
+            if (!$chatSession) {
+                $chatSession = auth()->user()->chatSessions()->create([
+                    'title' => $request->input('message', 'محادثة جديدة'),
+                    'model' => $model,
+                ]);
+            }
+        }
+
+        if ($chatSession) {
+            $chatSession->messages()->create([
+                'role' => 'user',
+                'content' => $request->input('message', ''),
+                'tokens' => 0,
+            ]);
+        }
+
+        $systemContent = 'You are a Search Engine and Information Analyst specialized in Computer Science terminology. Your goal is to provide detailed and accurate search reports.
+
+OPERATIONAL RULES:
+1. RESPONSE FORMAT: Use clear headings (Markdown # and ##), bullet points, and tables.
+2. LANGUAGE: Always respond in ARABIC.
+3. DATA PRECISION: Always cite the Resource Name and Page Number.
+4. TONALITY: Professional, factual. No conversational filler.
+5. TOOL:
+   - **search_terms(query, exact_match?, limit?)**: بحث في قاعدة بيانات المصطلحات العربية-الإنجليزية. يُرجع المصطلحات مع معلومات المصدر (المرجع والصفحة).
+
+IMPORTANT: ابحث بـ search_terms ثم اكتب ردك مباشرة. لا تطلب أدوات أخرى. لا تكرر الاستدعاء.
+
+CRITICAL FORMATTING RULES:
+- markdown: استخدم مسافات بعد ## و ** و * وقبل وبعد | في الجداول
+- مثال صحيح: "## نتائج البحث" — خطأ: "##نتائجالبحث"
+- مثال صحيح: "| مصطلح | ترجمة |" — خطأ: "|مصطلح|ترجمة|"
+- كل كلمة عربية يجب أن تفصل بمسافة';
+
+        $messages = array_merge([['role' => 'system', 'content' => $systemContent]], $userMessages);
+
+        // Context window: keep last 12 + system prompt
+        if (count($messages) > 13) {
+            $messages = array_merge([$messages[0]], array_slice($messages, -12));
+        }
+
+        $tools = $this->getChatTools();
+        $fullResponse = '';
+        $content = '';
+
+        return response()->stream(function () use ($request, $messages, $tools, $model, $chatSession, &$fullResponse) {
             if (ob_get_level()) ob_end_clean();
 
             try {
-                $systemMessage = [
-                    'role' => 'system', 
-                    'content' => 'You are a helpful assistant capable of searching for terms and listing resources used in the database. 
-                    
-IMPORTANT:
-1. Always respond in ARABIC, even if the user asks in English.
-2. Always mention the Resource Name and Page Number for each term found (in Arabic context).
-3. If the user asks for exact matches, use the `search_terms` tool with `exact_match=true`.
-4. If the user asks about the project or capabilities, use `get_project_info`.
-'
-                ];
-
-                // Prepend system message to history
-                $messages = array_merge([$systemMessage], $userMessages);
-
-                $tools = [
-                    [
-                        'type' => 'function',
-                        'function' => [
-                            'name' => 'search_terms',
-                            'description' => 'Search for terms in the database. Returns grouped terms with resource information.',
-                            'parameters' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'query' => [
-                                        'type' => 'string',
-                                        'description' => 'The search query for terms (English or Arabic)',
-                                    ],
-                                    'exact_match' => [
-                                        'type' => 'boolean',
-                                        'description' => 'Set to true for exact match only, false for partial match (default)',
-                                    ],
-                                ],
-                                'required' => ['query'],
-                            ],
-                        ],
-                    ],
-                    [
-                        'type' => 'function',
-                        'function' => [
-                            'name' => 'get_project_info',
-                            'description' => 'Get information about the project, what it does, and what tools are available.',
-                            'parameters' => [
-                                'type' => 'object',
-                                'properties' => (object)[],
-                            ],
-                        ],
-                    ],
-                    [
-                        'type' => 'function',
-                        'function' => [
-                            'name' => 'list_resources',
-                            'description' => 'List all available resources with their status and page counts.',
-                            'parameters' => [
-                                'type' => 'object',
-                                'properties' => (object)[],
-                            ],
-                        ],
-                    ],
-                ];
-
-                // First call - check if tools are needed (not streamed yet)
+                // First call - check if tools are needed
                 $response = OpenAI::chat()->create([
-                    'model' => env('OPENAI_MODEL', 'deepseek-chat'),
+                    'model' => $model,
                     'messages' => $messages,
                     'tools' => $tools,
                 ]);
@@ -111,46 +104,20 @@ IMPORTANT:
                 $choice = $response->choices[0];
                 $finishReason = $choice->finishReason;
 
-                // If the model wants to call a tool
                 if ($finishReason === 'tool_calls' || $choice->message->toolCalls) {
-                    // Send a "thinking" chunk to the client
                     echo json_encode(['chunk' => "Thinking...\n"]) . "\n";
                     flush();
 
                     $toolCalls = $choice->message->toolCalls;
-                    
-                    // Append the assistant's message with tool calls to history
                     $messages[] = $choice->message->toArray();
 
                     foreach ($toolCalls as $toolCall) {
                         $functionName = $toolCall->function->name;
                         $arguments = json_decode($toolCall->function->arguments, true);
-                        
-                        $result = null;
 
-                        try {
-                            if ($functionName === 'search_terms') {
-                                $result = $this->searchService->searchTerms($arguments['query'] ?? '', $arguments['exact_match'] ?? false);
-                            } elseif ($functionName === 'list_resources') {
-                                $result = $this->searchService->listResources();
-                            } elseif ($functionName === 'get_project_info') {
-                                $result = [
-                                    'name' => 'Term Extractor AI',
-                                    'description' => 'A system to extract, verify, and search for terminology from PDF resources.',
-                                    'capabilities' => [
-                                        'Search Terms' => 'Find terms in English or Arabic, with options for exact or partial matching.',
-                                        'List Resources' => 'View all PDF resources the terms are extracted from.',
-                                        'Detailed Context' => 'See exactly which page number a term appears on in a specific book.',
-                                    ]
-                                ];
-                            } else {
-                                $result = ['error' => "Unknown tool: $functionName"];
-                            }
-                        } catch (\Exception $e) {
-                            $result = ['error' => $e->getMessage()];
-                        }
+                        $result = $this->executeTool($functionName, $arguments, $arguments['query'] ?? '');
+                        $result = $this->truncateResult($result);
 
-                        // Append tool result to messages
                         $messages[] = [
                             'role' => 'tool',
                             'tool_call_id' => $toolCall->id,
@@ -160,36 +127,27 @@ IMPORTANT:
 
                     // Streaming the final response
                     $stream = OpenAI::chat()->createStreamed([
-                        'model' => env('OPENAI_MODEL', 'deepseek-chat'),
+                        'model' => $model,
                         'messages' => $messages,
                     ]);
 
                     foreach ($stream as $response) {
                         if (isset($response->choices[0]->delta->content)) {
                             $content = $response->choices[0]->delta->content;
-                            
-                            // Aggressively clean ANY tag that looks like internal model instructions
-                            // Handles <|DSML|...>, <dsml>...</dsml>, <think>...</think>, etc.
-                            // Also handle the variations with unicode pipes if they occur
-                            $content = preg_replace('/<[\|｜].*?[\|｜]>/su', '', $content);
-                            $content = preg_replace('/<dsml>.*?<\/dsml>/si', '', $content);
-                            $content = preg_replace('/<think>.*?<\/think>/si', '', $content);
-                            
+                            $content = $this->postProcessContent($content);
+
                             if ($content !== '') {
+                                $fullResponse .= $content;
                                 echo json_encode(['chunk' => $content]) . "\n";
                                 flush();
                             }
                         }
                     }
-
                 } else {
-                    // No tool called, just stream the original content
-                    $content = $choice->message->content;
-                    // Aggressive clean
-                    $content = preg_replace('/<[\|｜].*?[\|｜]>/su', '', $content);
-                    $content = preg_replace('/<dsml>.*?<\/dsml>/si', '', $content);
-                    $content = preg_replace('/<think>.*?<\/think>/si', '', $content);
-                    
+                    // No tool called
+                    $content = $this->postProcessContent($choice->message->content ?? '');
+                    $fullResponse = $content;
+
                     echo json_encode(['chunk' => $content]) . "\n";
                     flush();
                 }
@@ -198,12 +156,71 @@ IMPORTANT:
                 echo json_encode(['chunk' => "Error: " . $e->getMessage()]) . "\n";
                 flush();
             }
-
         }, 200, [
             'Content-Type' => 'application/x-ndjson',
             'X-Accel-Buffering' => 'no',
             'Cache-Control' => 'no-cache',
             'Connection' => 'keep-alive',
         ]);
+
+        if ($chatSession && $fullResponse) {
+            $chatSession->messages()->create([
+                'role' => 'assistant',
+                'content' => $fullResponse,
+                'tokens' => $response?->usage?->totalTokens ?? 0,
+            ]);
+        }
+    }
+
+    private function executeTool(string $functionName, array $arguments, string $query): array
+    {
+        if ($functionName === 'search_terms') {
+            $exactMatch = $arguments['exact_match'] ?? false;
+            $limit = $arguments['limit'] ?? 5;
+            return app(SearchService::class)->searchTerms($query, $exactMatch, $limit) ?? ['results' => [], 'total' => 0];
+        }
+        return ['error' => "Unknown tool: $functionName"];
+    }
+
+    private function getChatTools(): array
+    {
+        return [
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'search_terms',
+                    'description' => 'البحث في قاعدة بيانات المصطلحات العربية-الإنجليزية',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'query' => ['type' => 'string', 'description' => 'كلمة البحث'],
+                            'exact_match' => ['type' => 'boolean', 'description' => 'بحث مطابق', 'default' => false],
+                            'limit' => ['type' => 'integer', 'description' => 'عدد النتائج (أقصى 10)', 'default' => 5],
+                        ],
+                        'required' => ['query'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private function truncateResult(array $result): array
+    {
+        $maxLen = 3000;
+        $json = json_encode($result, JSON_UNESCAPED_UNICODE);
+        if (mb_strlen($json) <= $maxLen) return $result;
+        if (isset($result['results']) && is_array($result['results'])) {
+            $result['results'] = array_slice($result['results'], 0, 8);
+            $result['note'] = '... تم تقليص النتائج';
+        }
+        $result['_truncated'] = true;
+        return $result;
+    }
+
+    private function postProcessContent(string $text): string
+    {
+        // Minimal cleanup
+        $text = preg_replace('/\s{2,}/u', ' ', $text);
+        return trim($text);
     }
 }
